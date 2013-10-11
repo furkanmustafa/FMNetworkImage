@@ -27,7 +27,7 @@ I like `apt` though.
 
 ### Notes
 
- **DOESN'T** use ARC. If you're using ARC in your project, you'll need `-fno-objc-arc` for these files
+ **DOESN'T** use ARC. If you're using ARC in your project, you'll need `-fno-objc-arc` for `FMNetworkImage.m` [need help?](http://stackoverflow.com/questions/6646052/how-can-i-disable-arc-for-a-single-file-in-a-project)
 
 ### License
 
