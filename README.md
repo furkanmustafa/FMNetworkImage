@@ -27,7 +27,7 @@ I like `apt` though.
 
 ### Notes
 
- **DOESN'T** use ARC. If you're using ARC in your project, you'll need `-objc-noarc` for these files
+ **DOESN'T** use ARC. If you're using ARC in your project, you'll need `-fno-objc-arc` for these files
 
 ### License
 
