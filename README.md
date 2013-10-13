@@ -31,35 +31,38 @@ Usage
 =====
 
 **Simply**
-	
-	// on any UIImageView
-	myImageView.netImage.URL = [NSURL URLWithString:@"http://url.to/my/image"];
+```objc
+// on any UIImageView
+myImageView.netImage.URL = [NSURL URLWithString:@"http://url.to/my/image"];
+```
 
 **Compatibility Shortcut**
-
-	myImageView.imageURL = [NSURL URLWithString:@"http://url.to/my/image"];
+```objc
+myImageView.imageURL = [NSURL URLWithString:@"http://url.to/my/image"];
+```
 
 **Advanced Usage**
+```objc
+UIImageView* imageView = [UIImageView.alloc initWithFrame:CGRectInset(self.frame, 10, 10)].autorelease;
+imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth + UIViewAutoresizingFlexibleHeight;
+imageView.backgroundColor = UIColor.darkGrayColor;
+imageView.netImage.placeholderImage = [UIImage imageNamed:@"placeholder.png"];
+imageView.netImage.placeholderContentMode = UIViewContentModeCenter;
+imageView.netImage.loadedImageContentMode = UIViewContentModeScaleAspectFill;
+imageView.netImage.crossfadeImages = YES;
+imageView.netImage.delayBeforeLoading = 1.0 / 30.0;
+imageView.netImage.fixImageCropResize = YES;
+imageView.clipsToBounds = YES;
 
-	UIImageView* imageView = [UIImageView.alloc initWithFrame:CGRectInset(self.frame, 10, 10)].autorelease;
-	imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth + UIViewAutoresizingFlexibleHeight;
-	imageView.backgroundColor = UIColor.darkGrayColor;
-	imageView.netImage.placeholderImage = [UIImage imageNamed:@"placeholder.png"];
-	imageView.netImage.placeholderContentMode = UIViewContentModeCenter;
-	imageView.netImage.loadedImageContentMode = UIViewContentModeScaleAspectFill;
-	imageView.netImage.crossfadeImages = YES;
-	imageView.netImage.delayBeforeLoading = 1.0 / 30.0;
-	imageView.netImage.fixImageCropResize = YES;
-	imageView.clipsToBounds = YES;
-
-	imageView.netImage.URL = @"http://url.to/my/image";
+imageView.netImage.URL = @"http://url.to/my/image";
+```
 
 **UITableViewCell / UICollectionViewCell Notes**
-
-	- (void)prepareForReuse {
-		imageView.netImage.URL = nil; // Sets image to placeholderImage or empty if no placeholder image is present.
-	}
-	
+```objc
+- (void)prepareForReuse {
+	imageView.netImage.URL = nil; // Sets image to placeholderImage or empty if no placeholder image is present.
+}
+```	
 
 Install
 =======
