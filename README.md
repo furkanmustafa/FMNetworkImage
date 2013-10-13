@@ -12,9 +12,8 @@ Features
 
 *As of 13th October 2013 :*
 
-- Code converted to use a ImageView Category, `UIImageView+FMNetworkImage`, with Obj-C Associated Objects
+- Code converted to use a ImageView Category, `UIImageView+FMNetworkImage`, with Obj-C Associated Objects. *( Old code for separate view class is remaining, but is outdated now. )*
 - Background resizing (respecting contentMode) for images with different size than imageView, eliminating glitches in UI when setting the image in the main thread.
-- Old code for separate view class is remaining, but is outdated now.
 
 *Originally:*
 

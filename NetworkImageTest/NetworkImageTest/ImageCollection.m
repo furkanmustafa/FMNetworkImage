@@ -109,14 +109,18 @@ NSString* const ImageCollectionCell_ReuseIdentifier = @"ImageCollectionCell";
     if (self) {
  		self.backgroundColor = UIColor.whiteColor;
 		self.autoresizesSubviews = YES;
-        imageView = [UIImageView.alloc initWithFrame:CGRectMake(10, 10, frame.size.width - 20, frame.size.height - 20)].autorelease;
+
+        imageView = [UIImageView.alloc initWithFrame:CGRectInset(self.frame, 10, 10)].autorelease;
 		imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth + UIViewAutoresizingFlexibleHeight;
 		imageView.backgroundColor = UIColor.darkGrayColor;
+		imageView.netImage.placeholderImage = [UIImage imageNamed:@"placeholder.png"];
+		imageView.netImage.placeholderContentMode = UIViewContentModeCenter;
+		imageView.netImage.loadedImageContentMode = UIViewContentModeScaleAspectFill;
 		imageView.netImage.crossfadeImages = YES;
-		imageView.netImage.loadedImageContentMode = UIViewContentModeTopRight;
 		imageView.netImage.delayBeforeLoading = 1.0 / 30.0;
 		imageView.netImage.fixImageCropResize = YES;
 		imageView.clipsToBounds = YES;
+		
 		[self addSubview:imageView];
    }
     return self;
