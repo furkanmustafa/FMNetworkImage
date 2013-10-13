@@ -110,9 +110,9 @@ NSString* const ImageCollectionCell_ReuseIdentifier = @"ImageCollectionCell";
  		self.backgroundColor = UIColor.whiteColor;
 		self.autoresizesSubviews = YES;
 
-        imageView = [UIImageView.alloc initWithFrame:CGRectInset(self.frame, 10, 10)].autorelease;
+        imageView = [UIImageView.alloc initWithFrame:CGRectInset(self.bounds, 10, 10)].autorelease;
 		imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth + UIViewAutoresizingFlexibleHeight;
-		imageView.backgroundColor = UIColor.darkGrayColor;
+		imageView.backgroundColor = UIColor.lightGrayColor;
 		imageView.netImage.placeholderImage = [UIImage imageNamed:@"placeholder.png"];
 		imageView.netImage.placeholderContentMode = UIViewContentModeCenter;
 		imageView.netImage.loadedImageContentMode = UIViewContentModeScaleAspectFill;
