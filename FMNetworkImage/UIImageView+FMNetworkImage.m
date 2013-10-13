@@ -9,8 +9,13 @@
 #import <mach/mach_time.h>
 #import <objc/runtime.h>
 
+#define FMNetworkImage_GPUIMAGE_Enabled
+#ifdef FMNetworkImage_GPUIMAGE_Enabled
+#import <GPUImage/GPUImage.h>
+#endif
+
 // Uncomment to see how much decoding takes in logs
-//#define FMNetworkImage_Profiling
+#define FMNetworkImage_Profiling
 
 @implementation UIImageView (FMNetworkImageCategory)
 - (void)setNetImage:(FMNetworkImage *)netImage {
@@ -344,12 +349,11 @@
 	if (!_imageScale || _imageScale < 1)
 		_imageScale = UIScreen.mainScreen.scale;
 	
-	CGImageRef imageRef;
 	CGSize imageSize = CGSizeMake(imageToDecompress.size.width * imageToDecompress.scale, imageToDecompress.size.height * imageToDecompress.scale);
 	CGSize targetSize = imageSize;
-	if (_fixImageCropResize) {
-		CGRect targetRect = (CGRect){ CGPointZero, targetSize };
-
+	CGRect targetRect = (CGRect){ CGPointZero, targetSize };
+	
+	if (_fixImageCropResize) { // determine cropping / resize
 		CGFloat imageAspectRatio = imageToDecompress.size.width / imageToDecompress.size.height;
 		CGFloat viewAspectRatio = imageViewBounds.size.width / imageViewBounds.size.height;
 		CGPoint viewImageRatio = (CGPoint){
@@ -395,10 +399,61 @@
 			}
 		}
 		
-		imageRef = CGImageCreateWithImageInRect(imageToDecompress.CGImage, targetRect);
-	} else {
-		imageRef = imageToDecompress.CGImage;
 	}
+
+	CGImageRef imageRef;
+	if (_fixImageCropResize) {
+
+#ifdef FMNetworkImage_GPUIMAGE_Enabled
+		imageRef = imageToDecompress.CGImage;
+		CGImageRef filtered = CGImageRetain(imageRef);
+		
+		// CROP Process
+		if (targetRect.origin.x != 0 || targetRect.origin.y != 0 || !CGSizeEqualToSize(targetRect.size, imageSize)) {
+			CGRect gpuImageCropScales = CGRectMake(targetRect.origin.x / imageSize.width,
+												   targetRect.origin.y / imageSize.height,
+												   targetRect.size.width / imageSize.width,
+												   targetRect.size.height / imageSize.height);
+			GPUImageCropFilter* cropFilter = [GPUImageCropFilter.alloc initWithCropRegion:gpuImageCropScales];
+			
+			CGImageRef new = [cropFilter newCGImageByFilteringCGImage:filtered];
+			CGImageRelease(filtered);
+			filtered = new;
+			
+			[cropFilter release];
+		}
+		
+		// RESIZE Image
+		if (!CGSizeEqualToSize((CGSize){ CGImageGetWidth(filtered), CGImageGetHeight(filtered) }, targetSize)) {
+			GPUImageTransformFilter* resizeFilter = GPUImageTransformFilter.new;
+//			resizeFilter.affineTransform = CGAffineTransformMakeScale(1, 1);
+			[resizeFilter forceProcessingAtSize:targetSize];
+			
+			CGImageRef new = [resizeFilter newCGImageByFilteringCGImage:filtered];
+			CGImageRelease(filtered);
+			filtered = new;
+			
+			[resizeFilter release];
+		}
+		
+		if (filtered != imageRef) {
+			imageRef = filtered;
+		}
+		
+//		imageRef = imageToDecompress.CGImage;
+#else
+		imageRef = CGImageCreateWithImageInRect(imageToDecompress.CGImage, targetRect);
+#endif
+	} else {
+		imageRef = CGImageRetain(imageToDecompress.CGImage);
+	}
+	[imageToDecompress release];
+
+#if defined(FMNetworkImage_Profiling) && defined(DEBUG)
+	uint64_t time_ba = mach_absolute_time();
+	elapsedTime = ((time_ba - time_a) * timeBaseInfo.numer / timeBaseInfo.denom) / 1000000.0;
+	[self log:@"Decoding .... : %.3f ms, ..", elapsedTime];
+#endif
 
 	CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 	CGContextRef context = CGBitmapContextCreate(NULL,
@@ -413,12 +468,12 @@
 												 kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little);
 	CGColorSpaceRelease(colorSpace);
 	if (!context) {
-		[imageToDecompress release];
+		CGImageRelease(imageRef);
 		return;
 	}
 	if ([FMNetworkImageOperation.currentOperation isCancelled]) {
 		CGContextRelease(context);
-		[imageToDecompress release];
+		CGImageRelease(imageRef);
 		return;
 	}
 	
@@ -426,6 +481,8 @@
 	CGContextDrawImage(context, rect, imageRef);
 	CGImageRef decompressedImageRef = CGBitmapContextCreateImage(context);
 	CGContextRelease(context);
+	
+	CGImageRelease(imageRef);
 	
 	UIImage *decompressedImage = [[UIImage alloc] initWithCGImage:decompressedImageRef scale:_imageScale orientation:UIImageOrientationUp];
 	CGImageRelease(decompressedImageRef);
@@ -436,12 +493,10 @@
 	[self log:@"Decoding took : %.3f ms, Size : %@", elapsedTime, NSStringFromCGSize(decompressedImage.size)];
 #endif
 	
-	if ([FMNetworkImageOperation.currentOperation isCancelled] || self.rawRemoteImage != imageToDecompress) {
+	if ([FMNetworkImageOperation.currentOperation isCancelled]) {
 		[decompressedImage release];
-		[imageToDecompress release];
 		return;
 	}
-	[imageToDecompress release];
 	
 	[self decodedImageInto:decompressedImage];
 	[decompressedImage release];
