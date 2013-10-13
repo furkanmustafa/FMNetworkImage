@@ -9,6 +9,14 @@ table views, scrolling fast through images.
 
 ### Features
 
+*As of 13th October 2013 :*
+
+- Code converted to use a ImageView Category, `UIImageView+FMNetworkImage`, with Obj-C Associated Objects
+- Background resizing (respecting contentMode) for images with different size than imageView, eliminating glitches in UI when setting the UI.
+- Old code for separate view class is remaining, but is outdated now.
+
+*Originally:*
+
 - Background Fetching
 - Optional Delay before fetch 
   *( So you use this to prevent loading an image for a cell that's gonna
@@ -22,7 +30,7 @@ table views, scrolling fast through images.
 
 ### Install
 
-Just Copy `FMNetworkImage.(m|h)` in your project. I don't like `bundle`,`composer`,`pip`,`pod`,`npm` at all.
+Just Copy `UIImageView+FMNetworkImage.(m|h)` in your project. I don't like `bundle`,`composer`,`pip`,`pod`,`npm` at all.
 I like `apt` though.
 
 ### Notes

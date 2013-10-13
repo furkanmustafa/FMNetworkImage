@@ -13,27 +13,11 @@
 		DC1D3ABC1805884C0045D441 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DC1D3ABA1805884C0045D441 /* InfoPlist.strings */; };
 		DC1D3ABE1805884C0045D441 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1D3ABD1805884C0045D441 /* main.m */; };
 		DC1D3AC21805884C0045D441 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1D3AC11805884C0045D441 /* AppDelegate.m */; };
-		DC1D3AC51805884C0045D441 /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DC1D3AC31805884C0045D441 /* Main_iPhone.storyboard */; };
-		DC1D3AC81805884C0045D441 /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DC1D3AC61805884C0045D441 /* Main_iPad.storyboard */; };
-		DC1D3ACB1805884C0045D441 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1D3ACA1805884C0045D441 /* ViewController.m */; };
 		DC1D3ACD1805884C0045D441 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC1D3ACC1805884C0045D441 /* Images.xcassets */; };
-		DC1D3AD41805884C0045D441 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC1D3AD31805884C0045D441 /* XCTest.framework */; };
-		DC1D3AD51805884C0045D441 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC1D3AB11805884C0045D441 /* Foundation.framework */; };
-		DC1D3AD61805884C0045D441 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC1D3AB51805884C0045D441 /* UIKit.framework */; };
-		DC1D3ADE1805884C0045D441 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DC1D3ADC1805884C0045D441 /* InfoPlist.strings */; };
-		DC1D3AE01805884C0045D441 /* NetworkImageTestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1D3ADF1805884C0045D441 /* NetworkImageTestTests.m */; };
-		DC1D3AEC180588550045D441 /* FMNetworkImage.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1D3AEB180588550045D441 /* FMNetworkImage.m */; };
+		DC43920718085FDE00BC64D4 /* ImageCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43920618085FDE00BC64D4 /* ImageCollection.m */; };
+		DC43920A1808695100BC64D4 /* UIImageView+FMNetworkImage.m in Sources */ = {isa = PBXBuildFile; fileRef = DC4392091808695100BC64D4 /* UIImageView+FMNetworkImage.m */; };
+		DC43920C1808832900BC64D4 /* urls.txt in Resources */ = {isa = PBXBuildFile; fileRef = DC43920B1808832900BC64D4 /* urls.txt */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		DC1D3AD71805884C0045D441 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = DC1D3AA61805884B0045D441 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = DC1D3AAD1805884C0045D441;
-			remoteInfo = NetworkImageTest;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		DC1D3AAE1805884C0045D441 /* NetworkImageTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetworkImageTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -46,18 +30,15 @@
 		DC1D3ABF1805884C0045D441 /* NetworkImageTest-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NetworkImageTest-Prefix.pch"; sourceTree = "<group>"; };
 		DC1D3AC01805884C0045D441 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		DC1D3AC11805884C0045D441 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		DC1D3AC41805884C0045D441 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
-		DC1D3AC71805884C0045D441 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
-		DC1D3AC91805884C0045D441 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		DC1D3ACA1805884C0045D441 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		DC1D3ACC1805884C0045D441 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		DC1D3AD21805884C0045D441 /* NetworkImageTestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NetworkImageTestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC1D3AD31805884C0045D441 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		DC1D3ADB1805884C0045D441 /* NetworkImageTestTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "NetworkImageTestTests-Info.plist"; sourceTree = "<group>"; };
-		DC1D3ADD1805884C0045D441 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		DC1D3ADF1805884C0045D441 /* NetworkImageTestTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NetworkImageTestTests.m; sourceTree = "<group>"; };
 		DC1D3AEA180588550045D441 /* FMNetworkImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMNetworkImage.h; sourceTree = "<group>"; };
 		DC1D3AEB180588550045D441 /* FMNetworkImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMNetworkImage.m; sourceTree = "<group>"; };
+		DC43920518085FDE00BC64D4 /* ImageCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageCollection.h; sourceTree = "<group>"; };
+		DC43920618085FDE00BC64D4 /* ImageCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageCollection.m; sourceTree = "<group>"; };
+		DC4392081808695100BC64D4 /* UIImageView+FMNetworkImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImageView+FMNetworkImage.h"; sourceTree = "<group>"; };
+		DC4392091808695100BC64D4 /* UIImageView+FMNetworkImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+FMNetworkImage.m"; sourceTree = "<group>"; };
+		DC43920B1808832900BC64D4 /* urls.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = urls.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,16 +52,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DC1D3ACF1805884C0045D441 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DC1D3AD41805884C0045D441 /* XCTest.framework in Frameworks */,
-				DC1D3AD61805884C0045D441 /* UIKit.framework in Frameworks */,
-				DC1D3AD51805884C0045D441 /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -89,9 +60,9 @@
 			children = (
 				DC1D3AE9180588550045D441 /* FMNetworkImage */,
 				DC1D3AB71805884C0045D441 /* NetworkImageTest */,
-				DC1D3AD91805884C0045D441 /* NetworkImageTestTests */,
 				DC1D3AB01805884C0045D441 /* Frameworks */,
 				DC1D3AAF1805884C0045D441 /* Products */,
+				DC1D3AB81805884C0045D441 /* Supporting Files */,
 			);
 			sourceTree = "<group>";
 		};
@@ -99,7 +70,6 @@
 			isa = PBXGroup;
 			children = (
 				DC1D3AAE1805884C0045D441 /* NetworkImageTest.app */,
-				DC1D3AD21805884C0045D441 /* NetworkImageTestTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -120,12 +90,10 @@
 			children = (
 				DC1D3AC01805884C0045D441 /* AppDelegate.h */,
 				DC1D3AC11805884C0045D441 /* AppDelegate.m */,
-				DC1D3AC31805884C0045D441 /* Main_iPhone.storyboard */,
-				DC1D3AC61805884C0045D441 /* Main_iPad.storyboard */,
-				DC1D3AC91805884C0045D441 /* ViewController.h */,
-				DC1D3ACA1805884C0045D441 /* ViewController.m */,
 				DC1D3ACC1805884C0045D441 /* Images.xcassets */,
-				DC1D3AB81805884C0045D441 /* Supporting Files */,
+				DC43920518085FDE00BC64D4 /* ImageCollection.h */,
+				DC43920618085FDE00BC64D4 /* ImageCollection.m */,
+				DC43920B1808832900BC64D4 /* urls.txt */,
 			);
 			path = NetworkImageTest;
 			sourceTree = "<group>";
@@ -139,24 +107,7 @@
 				DC1D3ABF1805884C0045D441 /* NetworkImageTest-Prefix.pch */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		DC1D3AD91805884C0045D441 /* NetworkImageTestTests */ = {
-			isa = PBXGroup;
-			children = (
-				DC1D3ADF1805884C0045D441 /* NetworkImageTestTests.m */,
-				DC1D3ADA1805884C0045D441 /* Supporting Files */,
-			);
-			path = NetworkImageTestTests;
-			sourceTree = "<group>";
-		};
-		DC1D3ADA1805884C0045D441 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				DC1D3ADB1805884C0045D441 /* NetworkImageTestTests-Info.plist */,
-				DC1D3ADC1805884C0045D441 /* InfoPlist.strings */,
-			);
-			name = "Supporting Files";
+			path = NetworkImageTest;
 			sourceTree = "<group>";
 		};
 		DC1D3AE9180588550045D441 /* FMNetworkImage */ = {
@@ -164,6 +115,8 @@
 			children = (
 				DC1D3AEA180588550045D441 /* FMNetworkImage.h */,
 				DC1D3AEB180588550045D441 /* FMNetworkImage.m */,
+				DC4392081808695100BC64D4 /* UIImageView+FMNetworkImage.h */,
+				DC4392091808695100BC64D4 /* UIImageView+FMNetworkImage.m */,
 			);
 			name = FMNetworkImage;
 			path = ../FMNetworkImage;
@@ -189,24 +142,6 @@
 			productReference = DC1D3AAE1805884C0045D441 /* NetworkImageTest.app */;
 			productType = "com.apple.product-type.application";
 		};
-		DC1D3AD11805884C0045D441 /* NetworkImageTestTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DC1D3AE61805884C0045D441 /* Build configuration list for PBXNativeTarget "NetworkImageTestTests" */;
-			buildPhases = (
-				DC1D3ACE1805884C0045D441 /* Sources */,
-				DC1D3ACF1805884C0045D441 /* Frameworks */,
-				DC1D3AD01805884C0045D441 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				DC1D3AD81805884C0045D441 /* PBXTargetDependency */,
-			);
-			name = NetworkImageTestTests;
-			productName = NetworkImageTestTests;
-			productReference = DC1D3AD21805884C0045D441 /* NetworkImageTestTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -215,11 +150,6 @@
 			attributes = {
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = fume;
-				TargetAttributes = {
-					DC1D3AD11805884C0045D441 = {
-						TestTargetID = DC1D3AAD1805884C0045D441;
-					};
-				};
 			};
 			buildConfigurationList = DC1D3AA91805884B0045D441 /* Build configuration list for PBXProject "NetworkImageTest" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -235,7 +165,6 @@
 			projectRoot = "";
 			targets = (
 				DC1D3AAD1805884C0045D441 /* NetworkImageTest */,
-				DC1D3AD11805884C0045D441 /* NetworkImageTestTests */,
 			);
 		};
 /* End PBXProject section */
@@ -245,18 +174,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DC1D3AC81805884C0045D441 /* Main_iPad.storyboard in Resources */,
 				DC1D3ACD1805884C0045D441 /* Images.xcassets in Resources */,
-				DC1D3AC51805884C0045D441 /* Main_iPhone.storyboard in Resources */,
+				DC43920C1808832900BC64D4 /* urls.txt in Resources */,
 				DC1D3ABC1805884C0045D441 /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DC1D3AD01805884C0045D441 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DC1D3ADE1805884C0045D441 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -267,60 +187,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DC1D3ACB1805884C0045D441 /* ViewController.m in Sources */,
 				DC1D3AC21805884C0045D441 /* AppDelegate.m in Sources */,
 				DC1D3ABE1805884C0045D441 /* main.m in Sources */,
-				DC1D3AEC180588550045D441 /* FMNetworkImage.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DC1D3ACE1805884C0045D441 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DC1D3AE01805884C0045D441 /* NetworkImageTestTests.m in Sources */,
+				DC43920718085FDE00BC64D4 /* ImageCollection.m in Sources */,
+				DC43920A1808695100BC64D4 /* UIImageView+FMNetworkImage.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		DC1D3AD81805884C0045D441 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = DC1D3AAD1805884C0045D441 /* NetworkImageTest */;
-			targetProxy = DC1D3AD71805884C0045D441 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		DC1D3ABA1805884C0045D441 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
 				DC1D3ABB1805884C0045D441 /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		DC1D3AC31805884C0045D441 /* Main_iPhone.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DC1D3AC41805884C0045D441 /* Base */,
-			);
-			name = Main_iPhone.storyboard;
-			sourceTree = "<group>";
-		};
-		DC1D3AC61805884C0045D441 /* Main_iPad.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DC1D3AC71805884C0045D441 /* Base */,
-			);
-			name = Main_iPad.storyboard;
-			sourceTree = "<group>";
-		};
-		DC1D3ADC1805884C0045D441 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DC1D3ADD1805884C0045D441 /* en */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -411,7 +291,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NetworkImageTest/NetworkImageTest-Prefix.pch";
 				INFOPLIST_FILE = "NetworkImageTest/NetworkImageTest-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -425,50 +307,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NetworkImageTest/NetworkImageTest-Prefix.pch";
 				INFOPLIST_FILE = "NetworkImageTest/NetworkImageTest-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
-			};
-			name = Release;
-		};
-		DC1D3AE71805884C0045D441 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/NetworkImageTest.app/NetworkImageTest";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "NetworkImageTest/NetworkImageTest-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "NetworkImageTestTests/NetworkImageTestTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Debug;
-		};
-		DC1D3AE81805884C0045D441 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/NetworkImageTest.app/NetworkImageTest";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "NetworkImageTest/NetworkImageTest-Prefix.pch";
-				INFOPLIST_FILE = "NetworkImageTestTests/NetworkImageTestTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
 			};
 			name = Release;
 		};
@@ -491,14 +333,7 @@
 				DC1D3AE51805884C0045D441 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-		};
-		DC1D3AE61805884C0045D441 /* Build configuration list for PBXNativeTarget "NetworkImageTestTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				DC1D3AE71805884C0045D441 /* Debug */,
-				DC1D3AE81805884C0045D441 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
