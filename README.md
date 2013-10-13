@@ -19,8 +19,7 @@ table views, scrolling fast through images.
 
 - Background Fetching
 - Optional Delay before fetch 
-  *( So you use this to prevent loading an image for a cell that's gonna
-        be displayed for 1.5 miliseconds ( not 1.5ms literally :/ ) )*
+  *( So you use this to prevent loading an image for a cell that's gonna be displayed for 1.5 miliseconds ( not 1.5ms literally :/ ) )*
 - Optional Cross-Fade after load
 - Placeholder Image
 - `(UIImage*)onLoad(UIImage* loadedImage)` hook using blocks
@@ -35,7 +34,7 @@ I like `apt` though.
 
 ### Notes
 
- **DOESN'T** use ARC. If you're using ARC in your project, you'll need `-fno-objc-arc` for `FMNetworkImage.m` [need help?](http://stackoverflow.com/questions/6646052/how-can-i-disable-arc-for-a-single-file-in-a-project)
+ **DOESN'T** use ARC. If you're using ARC in your project, you'll need `-fno-objc-arc` for `UIImageView+FMNetworkImage.m` [need help?](http://stackoverflow.com/questions/6646052/how-can-i-disable-arc-for-a-single-file-in-a-project)
 
 ### License
 
