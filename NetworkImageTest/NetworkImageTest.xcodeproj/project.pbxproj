@@ -32,8 +32,8 @@
 		DC1D3AC11805884C0045D441 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		DC1D3ACC1805884C0045D441 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		DC1D3AD31805884C0045D441 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		DC1D3AEA180588550045D441 /* FMNetworkImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMNetworkImage.h; sourceTree = "<group>"; };
-		DC1D3AEB180588550045D441 /* FMNetworkImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMNetworkImage.m; sourceTree = "<group>"; };
+		DC1D3AEA180588550045D441 /* FMNetworkImage_old.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMNetworkImage_old.h; sourceTree = "<group>"; };
+		DC1D3AEB180588550045D441 /* FMNetworkImage_old.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMNetworkImage_old.m; sourceTree = "<group>"; };
 		DC43920518085FDE00BC64D4 /* ImageCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageCollection.h; sourceTree = "<group>"; };
 		DC43920618085FDE00BC64D4 /* ImageCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageCollection.m; sourceTree = "<group>"; };
 		DC4392081808695100BC64D4 /* UIImageView+FMNetworkImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImageView+FMNetworkImage.h"; sourceTree = "<group>"; };
@@ -113,8 +113,8 @@
 		DC1D3AE9180588550045D441 /* FMNetworkImage */ = {
 			isa = PBXGroup;
 			children = (
-				DC1D3AEA180588550045D441 /* FMNetworkImage.h */,
-				DC1D3AEB180588550045D441 /* FMNetworkImage.m */,
+				DC1D3AEA180588550045D441 /* FMNetworkImage_old.h */,
+				DC1D3AEB180588550045D441 /* FMNetworkImage_old.m */,
 				DC4392081808695100BC64D4 /* UIImageView+FMNetworkImage.h */,
 				DC4392091808695100BC64D4 /* UIImageView+FMNetworkImage.m */,
 			);
