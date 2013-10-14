@@ -14,7 +14,8 @@ Features / News
 
 - Decoded Image Cache support added, Using [NSCache](https://developer.apple.com/library/ios/documentation/cocoa/reference/NSCache_Class/Reference/Reference.html)
 
-** More About Decoded Image Cache **
+
+**More About Decoded Image Cache**
 
 ```objc
 // Note : You only need this in cases, where loaded images are bigger/smaller than the imageView, needs cropping/resizing.
