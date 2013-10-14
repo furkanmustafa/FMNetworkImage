@@ -115,7 +115,7 @@
 - (void)setURL:(NSURL *)URL {
 	if (URL==_URL || (_URL && URL && [URL.absoluteString isEqualToString:_URL.absoluteString])) return;
 	[self cancelLoading];
-
+	
 	[_URL autorelease]; _URL = [URL retain];
 	if (URL) {
 		[self initiateLoad:URL];
@@ -289,7 +289,7 @@
 - (void)cancelLoading {
 	
 	self.status = FMNetworkImageStatus_Idle;
-
+	
 	if (self.conn) {
 		[self.conn cancel];
 		self.conn = nil;
@@ -317,7 +317,7 @@
 }
 
 - (void)decodeImage {
-
+	
 	if ([FMNetworkImageOperation.currentOperation isCancelled])
 		return;
 	
@@ -335,21 +335,20 @@
 	uint64_t time_a = mach_absolute_time();
 	double elapsedTime = 0;
 #endif
-
+	
 	self.status = FMNetworkImageStatus_Decode;
-
+	
 	CGRect imageViewBounds = _imageView.bounds;
 	UIViewContentMode contentMode = _loadedImageContentMode ? _loadedImageContentMode : _imageView.contentMode;
 	
 	if (!_imageScale || _imageScale < 1)
 		_imageScale = UIScreen.mainScreen.scale;
 	
-	CGImageRef imageRef;
 	CGSize imageSize = CGSizeMake(imageToDecompress.size.width * imageToDecompress.scale, imageToDecompress.size.height * imageToDecompress.scale);
 	CGSize targetSize = imageSize;
-	if (_fixImageCropResize) {
-		CGRect targetRect = (CGRect){ CGPointZero, targetSize };
-
+	CGRect targetRect = (CGRect){ CGPointZero, targetSize };
+	
+	if (_fixImageCropResize) { // determine cropping / resize
 		CGFloat imageAspectRatio = imageToDecompress.size.width / imageToDecompress.size.height;
 		CGFloat viewAspectRatio = imageViewBounds.size.width / imageViewBounds.size.height;
 		CGPoint viewImageRatio = (CGPoint){
@@ -370,65 +369,120 @@
 			
 			targetSize = imageViewSize;
 		} else
-		if (contentMode == UIViewContentModeScaleAspectFit) { // most widely used
-			CGFloat multiplyRatio = MIN(viewImageRatio.x, viewImageRatio.y);
+			if (contentMode == UIViewContentModeScaleAspectFit) { // most widely used
+				CGFloat multiplyRatio = MIN(viewImageRatio.x, viewImageRatio.y);
+				
+				targetSize = (CGSize){ (int)floorf(imageToDecompress.size.width * multiplyRatio), (int)floorf(imageToDecompress.size.height * multiplyRatio) };
+			} else
+				if (contentMode == UIViewContentModeScaleToFill) {
+					targetSize = imageViewSize;
+				} else {
+					targetSize = imageViewSize;
+					targetRect.size = targetSize;
+					
+					if (contentMode == UIViewContentModeCenter || contentMode == UIViewContentModeTop || contentMode == UIViewContentModeBottom) {
+						targetRect.origin.x = (int)floorf((imageSize.width - targetRect.size.width) / 2);
+					}
+					if (contentMode == UIViewContentModeBottomRight || contentMode == UIViewContentModeRight || contentMode == UIViewContentModeTopRight) {
+						targetRect.origin.x = imageSize.width - targetRect.size.width;
+					}
+					if (contentMode == UIViewContentModeCenter || contentMode == UIViewContentModeLeft || contentMode == UIViewContentModeRight) {
+						targetRect.origin.y = (int)floorf((imageSize.height - targetRect.size.height) / 2);
+					}
+					if (contentMode == UIViewContentModeBottom || contentMode == UIViewContentModeBottomLeft || contentMode == UIViewContentModeBottomRight) {
+						targetRect.origin.y = imageSize.height - targetRect.size.height;
+					}
+				}
+		
+	}
+	
+	CGImageRef imageRef = CGImageRetain(imageToDecompress.CGImage);
+	
+	if (_fixImageCropResize) {
+		
+		CGImageRef filtered = CGImageRetain(imageRef);
+		
+		// CROP Process
+		if (targetRect.origin.x != 0 || targetRect.origin.y != 0 || !CGSizeEqualToSize(targetRect.size, imageSize)) {
 			
-			targetSize = (CGSize){ (int)floorf(imageToDecompress.size.width * multiplyRatio), (int)floorf(imageToDecompress.size.height * multiplyRatio) };
-		} else
-		if (contentMode == UIViewContentModeScaleToFill) {
-			targetSize = imageViewSize;
-		} else {
-			targetSize = imageViewSize;
-			targetRect.size = targetSize;
-
-			if (contentMode == UIViewContentModeCenter || contentMode == UIViewContentModeTop || contentMode == UIViewContentModeBottom) {
-				targetRect.origin.x = (int)floorf((imageSize.width - targetRect.size.width) / 2);
-			}
-			if (contentMode == UIViewContentModeBottomRight || contentMode == UIViewContentModeRight || contentMode == UIViewContentModeTopRight) {
-				targetRect.origin.x = imageSize.width - targetRect.size.width;
-			}
-			if (contentMode == UIViewContentModeCenter || contentMode == UIViewContentModeLeft || contentMode == UIViewContentModeRight) {
-				targetRect.origin.y = (int)floorf((imageSize.height - targetRect.size.height) / 2);
-			}
-			if (contentMode == UIViewContentModeBottom || contentMode == UIViewContentModeBottomLeft || contentMode == UIViewContentModeBottomRight) {
-				targetRect.origin.y = imageSize.height - targetRect.size.height;
-			}
+			CGImageRef new = CGImageCreateWithImageInRect(imageToDecompress.CGImage, targetRect);
+			CGImageRelease(filtered);
+			filtered = new;
+			
 		}
 		
-		imageRef = CGImageCreateWithImageInRect(imageToDecompress.CGImage, targetRect);
-	} else {
-		imageRef = imageToDecompress.CGImage;
+		// RESIZE Image
+		if (!CGSizeEqualToSize((CGSize){ CGImageGetWidth(filtered), CGImageGetHeight(filtered) }, targetSize)) {
+			
+			// do plug-in resizing here.. like using GPUImage or sth.
+		
+		}
+		
+		if (filtered != imageRef) {
+			CGImageRelease(imageRef);
+			imageRef = filtered;
+		}
 	}
-
-	CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-	CGContextRef context = CGBitmapContextCreate(NULL,
-												 targetSize.width,
-												 targetSize.height,
-												 8,
-												 // Just always return width * 4 will be enough
-												 CGImageGetWidth(imageRef) * 4,
-												 // System only supports RGB, set explicitly
-												 colorSpace,
-												 // Makes system don't need to do extra conversion when displayed.
-												 kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little);
-	CGColorSpaceRelease(colorSpace);
-	if (!context) {
-		[imageToDecompress release];
-		return;
-	}
-	if ([FMNetworkImageOperation.currentOperation isCancelled]) {
+	[imageToDecompress release];
+	
+#if defined(FMNetworkImage_Profiling) && defined(DEBUG)
+	{	uint64_t time_ba = mach_absolute_time();
+		elapsedTime = ((time_ba - time_a) * timeBaseInfo.numer / timeBaseInfo.denom) / 1000000.0;
+		[self log:@"Decoding .... : %.3f ms, ..", elapsedTime]; }
+#endif
+	
+	// COLORSPACE FIX ( Convert to final state like UIImageView is going to use, Got this part from SDWebImage )
+	CGColorSpaceRef deviceColorSpace = CGColorSpaceCreateDeviceRGB();
+	CGColorSpaceRef currentColorSpace = CGImageGetColorSpace(imageRef);
+	CGBitmapInfo currentBitmapInfo = CGImageGetBitmapInfo(imageRef);
+	CGSize currentSize = (CGSize){ CGImageGetWidth(imageRef), CGImageGetHeight(imageRef) };
+	
+	if (!CGSizeEqualToSize(currentSize, targetSize) ||
+		CGColorSpaceGetModel(currentColorSpace)!=CGColorSpaceGetModel(deviceColorSpace) ||
+		!(currentBitmapInfo & (kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little))) {
+		[self log:@"\tColorspace fix & Final Resize"];
+		
+		CGContextRef context = CGBitmapContextCreate(NULL,
+													 targetSize.width,
+													 targetSize.height,
+													 8,
+													 // Just always return width * 4 will be enough
+													 CGImageGetWidth(imageRef) * 4,
+													 // System only supports RGB, set explicitly
+													 deviceColorSpace,
+													 // Makes system don't need to do extra conversion when displayed.
+													 kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little);
+		if (!context) {
+			// FAILS :/
+			CGColorSpaceRelease(deviceColorSpace);
+			CGImageRelease(imageRef);
+			return;
+		}
+		
+		CGRect rect = (CGRect){ CGPointZero, targetSize };
+		CGContextDrawImage(context, rect, imageRef);
+		CGImageRef decompressedImageRef = CGBitmapContextCreateImage(context);
 		CGContextRelease(context);
-		[imageToDecompress release];
+		
+		CGImageRelease(imageRef);
+		imageRef = decompressedImageRef;
+	}
+	CGColorSpaceRelease(deviceColorSpace);
+	
+	if ([FMNetworkImageOperation.currentOperation isCancelled]) {
+		CGImageRelease(imageRef);
 		return;
 	}
 	
-	CGRect rect = (CGRect){ CGPointZero, targetSize };
-	CGContextDrawImage(context, rect, imageRef);
-	CGImageRef decompressedImageRef = CGBitmapContextCreateImage(context);
-	CGContextRelease(context);
+#if defined(FMNetworkImage_Profiling) && defined(DEBUG)
+	{	uint64_t time_ba = mach_absolute_time();
+		elapsedTime = ((time_ba - time_a) * timeBaseInfo.numer / timeBaseInfo.denom) / 1000000.0;
+		[self log:@"Decoding .... : %.3f ms, ..", elapsedTime]; }
+#endif
 	
-	UIImage *decompressedImage = [[UIImage alloc] initWithCGImage:decompressedImageRef scale:_imageScale orientation:UIImageOrientationUp];
-	CGImageRelease(decompressedImageRef);
+	// Finally the UIImage (retained)
+	UIImage *decompressedImage = [[UIImage alloc] initWithCGImage:imageRef scale:_imageScale orientation:UIImageOrientationUp];
+	CGImageRelease(imageRef);
 	
 #if defined(FMNetworkImage_Profiling) && defined(DEBUG)
 	uint64_t time_b = mach_absolute_time();
@@ -436,12 +490,10 @@
 	[self log:@"Decoding took : %.3f ms, Size : %@", elapsedTime, NSStringFromCGSize(decompressedImage.size)];
 #endif
 	
-	if ([FMNetworkImageOperation.currentOperation isCancelled] || self.rawRemoteImage != imageToDecompress) {
+	if ([FMNetworkImageOperation.currentOperation isCancelled]) {
 		[decompressedImage release];
-		[imageToDecompress release];
 		return;
 	}
-	[imageToDecompress release];
 	
 	[self decodedImageInto:decompressedImage];
 	[decompressedImage release];
