@@ -346,6 +346,7 @@
 
 	UIImage* imageToDecompress = self.rawRemoteImage.retain;
 	if (!imageToDecompress) return;
+	self.rawRemoteImage = nil; // release
 
 	NSURL* processingURL = [self.URL.retain autorelease];
 
