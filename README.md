@@ -7,13 +7,39 @@ After working with a few other alternatives, I ended up writing my own one.
 Codes might be a little bit of ugly, but I aimed for performance in this. Especially in 
 table views, scrolling fast through images.
 
-Features
-========
+Features / News
+===============
 
-*As of 13th October 2013 :*
+*14th October 2013:*
+
+- Decoded Image Cache support added, Using [NSCache](https://developer.apple.com/library/ios/documentation/cocoa/reference/NSCache_Class/Reference/Reference.html)
+
+** More About Decoded Image Cache **
+
+```objc
+// Note : You only need this in cases, where loaded images are bigger/smaller than the imageView, needs cropping/resizing.
+
+// This will make FMNetworkImage crop & resize your image in background to fit your imageView
+myImageview.netImage.fixImageCropResize = YES;
+
+// This will make cropped/resized/decoded image to be cached (not to be confused with url cache, this is RAW Bitmap)
+myImageview.netImage.cacheDecodedResults = YES;
+```
+
+The cache used here, will consume much more memory, but will be freed automatically when needed. All handled by [NSCache](https://developer.apple.com/library/ios/documentation/cocoa/reference/NSCache_Class/Reference/Reference.html) implementation of apple. Since the RAW Bitmap of resized image is cached, the UI Thread (Main Thread) will not deal with these and everything will work smoothly on UI.
+
+When an image gets deleted from this cache, and you try to load that image again, it will be loaded from URL Cache, and will get decoded/resized/cropped/whatever again, which is still OK.
+
+You should not use `fixImageCropResize` if you are going to resize that imageView randomly.
+
+===
+
+*13th October 2013:*
 
 - Code converted to use a ImageView Category, `UIImageView+FMNetworkImage`, with Obj-C Associated Objects. *( Old code for separate view class is remaining, but is outdated now. )*
 - Background resizing (respecting contentMode) for images with different size than imageView, eliminating glitches in UI when setting the image in the main thread.
+
+===
 
 *Originally:*
 
@@ -52,6 +78,7 @@ imageView.netImage.loadedImageContentMode = UIViewContentModeScaleAspectFill;
 imageView.netImage.crossfadeImages = YES;
 imageView.netImage.delayBeforeLoading = 1.0 / 30.0;
 imageView.netImage.fixImageCropResize = YES;
+imageView.netImage.cacheDecodedResults = YES;
 imageView.clipsToBounds = YES;
 
 imageView.netImage.URL = @"http://url.to/my/image";
