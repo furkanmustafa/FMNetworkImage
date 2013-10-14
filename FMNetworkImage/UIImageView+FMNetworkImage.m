@@ -126,6 +126,10 @@
 	}
 }
 
+- (CGSize)imageViewPixelSize {
+	return (CGSize){ _imageView.bounds.size.width * _imageScale, _imageView.bounds.size.height * _imageScale };
+}
+
 #pragma mark - Callbacks on Main Thread
 
 - (void)doneLoadingImage:(UIImage*)image {
@@ -237,12 +241,26 @@
 	
 	_loadingFromCacheDontFade = NO;
 	
-	// check for cached image
+	// Decoded Image Cache
+	if (_fixImageCropResize) {
+		UIImage* decodedCache = [self.class cachedDecodedImageForSourceURL:url
+																 resizedTo:self.imageViewPixelSize
+														  usingContentMode:_loadedImageContentMode ? _loadedImageContentMode : _imageView.contentMode];
+		if (decodedCache) {
+			_loadingFromCacheDontFade = YES;
+//			[self log:@"Resized Cache"];
+			[self doneLoadingImageFromAnyThread:decodedCache];
+			return;
+		}
+	}
+	
+	// URL Cache
 	// TODO : Make this async, while waiting for delay (if there is a delayBeforeLoading set)
 	UIImage* cached = [self.class cachedImageForURL:url];
 	if (cached) {
 		_loadingFromCacheDontFade = YES;
-		
+//		[self log:@"URL Cache"];
+
 		self.rawRemoteImage = cached;
 		[self schedule:@selector(decodeImage)];
 		
@@ -325,9 +343,12 @@
 		[[NSException exceptionWithName:@"MainThreadException" reason:@"Dont call -decodeImage from main thread" userInfo:nil] raise];
 		return;
 	}
+
 	UIImage* imageToDecompress = self.rawRemoteImage.retain;
 	if (!imageToDecompress) return;
-	
+
+	NSURL* processingURL = [self.URL.retain autorelease];
+
 #if defined(FMNetworkImage_Profiling) && defined(DEBUG)
 	mach_timebase_info_data_t timeBaseInfo;
 	mach_timebase_info(&timeBaseInfo);
@@ -440,7 +461,6 @@
 	if (!CGSizeEqualToSize(currentSize, targetSize) ||
 		CGColorSpaceGetModel(currentColorSpace)!=CGColorSpaceGetModel(deviceColorSpace) ||
 		!(currentBitmapInfo & (kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little))) {
-		[self log:@"\tColorspace fix & Final Resize"];
 		
 		CGContextRef context = CGBitmapContextCreate(NULL,
 													 targetSize.width,
@@ -483,6 +503,10 @@
 	// Finally the UIImage (retained)
 	UIImage *decompressedImage = [[UIImage alloc] initWithCGImage:imageRef scale:_imageScale orientation:UIImageOrientationUp];
 	CGImageRelease(imageRef);
+	
+	if (_cacheDecodedResults) {
+		[self.class saveDecodedImage:decompressedImage forSourceURL:processingURL resizedTo:targetSize usingContentMode:contentMode];
+	}
 	
 #if defined(FMNetworkImage_Profiling) && defined(DEBUG)
 	uint64_t time_b = mach_absolute_time();
@@ -617,3 +641,28 @@
 }
 
 @end
+
+@implementation FMNetworkImage (DecodedImageCache)
++ (NSCache*)sharedCache {
+	static NSCache* sharedCache = nil;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		sharedCache = [NSCache new];
+		sharedCache.name = @"FMNetworkImage Decoded Image Cache";
+	});
+	return sharedCache;
+}
++ (UIImage*)cachedDecodedImageForKey:(NSString*)key {
+	return [self.sharedCache objectForKey:key];
+}
++ (NSString*)keyForCachedDecodedImageForSourceURL:(NSURL*)URL resizedTo:(CGSize)size usingContentMode:(UIViewContentMode)contentMode {
+	return [NSString stringWithFormat:@"%d_%@_%d_%d", (int)contentMode, URL.absoluteString, (int)size.width, (int)size.height];
+}
++ (void)saveDecodedImage:(UIImage*)image forSourceURL:(NSURL*)URL resizedTo:(CGSize)size usingContentMode:(UIViewContentMode)contentMode {
+	[self.sharedCache setObject:image forKey:[self keyForCachedDecodedImageForSourceURL:URL resizedTo:size usingContentMode:contentMode]];
+}
++ (UIImage*)cachedDecodedImageForSourceURL:(NSURL*)URL resizedTo:(CGSize)size usingContentMode:(UIViewContentMode)contentMode {
+	return [self cachedDecodedImageForKey:[self keyForCachedDecodedImageForSourceURL:URL resizedTo:size usingContentMode:contentMode]];
+}
+@end
+

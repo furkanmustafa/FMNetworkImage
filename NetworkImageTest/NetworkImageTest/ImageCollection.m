@@ -119,6 +119,7 @@ NSString* const ImageCollectionCell_ReuseIdentifier = @"ImageCollectionCell";
 		imageView.netImage.crossfadeImages = YES;
 		imageView.netImage.delayBeforeLoading = 1.0 / 30.0;
 		imageView.netImage.fixImageCropResize = YES;
+		imageView.netImage.cacheDecodedResults = YES;
 		imageView.clipsToBounds = YES;
 		
 		[self addSubview:imageView];

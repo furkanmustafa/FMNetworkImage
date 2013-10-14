@@ -50,7 +50,8 @@ typedef NS_ENUM(NSUInteger, FMNetworkImageStatus) {
 @property (nonatomic, assign) NSTimeInterval loadingTook;
 
 @property (nonatomic, assign) BOOL crossfadeImages;
-@property (nonatomic, assign) BOOL fixImageCropResize; // improves performance, not finished yet
+@property (nonatomic, assign) BOOL fixImageCropResize;		// improves main-thread performance, not finished yet
+@property (nonatomic, assign) BOOL cacheDecodedResults;		// performance in exchange of (easily disposable) memory usage
 @property (nonatomic, assign) NSTimeInterval delayBeforeLoading;
 @property (nonatomic, copy) void (^onLoad) (UIImage* image);
 
@@ -61,4 +62,12 @@ typedef NS_ENUM(NSUInteger, FMNetworkImageStatus) {
 
 @property (nonatomic,retain) NSOperationQueue* queue;
 
+@end
+
+@interface FMNetworkImage (DecodedImageCache)
++ (NSCache*)sharedCache;
++ (UIImage*)cachedDecodedImageForKey:(NSString*)key;
++ (void)saveDecodedImage:(UIImage*)image forSourceURL:(NSURL*)URL resizedTo:(CGSize)size usingContentMode:(UIViewContentMode)contentMode;
++ (NSString*)keyForCachedDecodedImageForSourceURL:(NSURL*)URL resizedTo:(CGSize)size usingContentMode:(UIViewContentMode)contentMode;
++ (UIImage*)cachedDecodedImageForSourceURL:(NSURL*)URL resizedTo:(CGSize)size usingContentMode:(UIViewContentMode)contentMode;
 @end
