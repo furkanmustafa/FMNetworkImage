@@ -70,7 +70,7 @@ myImageView.imageURL = [NSURL URLWithString:@"http://url.to/my/image"];
 
 **Advanced Usage**
 ```objc
-UIImageView* imageView = [UIImageView.alloc initWithFrame:CGRectInset(self.frame, 10, 10)].autorelease;
+UIImageView* imageView = [UIImageView.alloc initWithFrame:CGRectInset(self.bounds, 10, 10)].autorelease;
 imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth + UIViewAutoresizingFlexibleHeight;
 imageView.backgroundColor = UIColor.darkGrayColor;
 imageView.netImage.placeholderImage = [UIImage imageNamed:@"placeholder.png"];
