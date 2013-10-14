@@ -39,7 +39,6 @@
 
 @interface FMNetworkImage ()
 @property (nonatomic,readwrite) FMNetworkImageStatus status;
-@property (nonatomic,readwrite) BOOL observeImageViewFrame;
 @end
 
 @interface FMNetworkImage (NSURLConnection) <NSURLConnectionDelegate,NSURLConnectionDataDelegate>
@@ -61,7 +60,6 @@
 
 - (void)dealloc {
 	self.imageView = nil;
-	self.observeImageViewFrame = NO;
 	[self cancelLoading];
 
 	self.onLoad = nil;
@@ -174,9 +172,6 @@
 	if (_placeholderImage && image == _placeholderImage)
 		self.imageView.contentMode = self.placeholderContentMode;
 	else if (image) {
-		if (_fixImageCropResize) {
-			self.observeImageViewFrame = YES;
-		}
 		self.imageView.contentMode = self.loadedImageContentMode;
 	}
 }
