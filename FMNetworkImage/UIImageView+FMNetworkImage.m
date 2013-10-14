@@ -356,7 +356,7 @@
 	
 	self.status = FMNetworkImageStatus_Decode;
 	
-	CGRect imageViewBounds = _imageView.bounds;
+	CGRect imageViewBounds = self.imageView.bounds;
 	UIViewContentMode contentMode = _loadedImageContentMode ? _loadedImageContentMode : _imageView.contentMode;
 	
 	if (!_imageScale || _imageScale < 1)
