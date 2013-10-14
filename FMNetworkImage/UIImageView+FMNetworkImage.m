@@ -60,19 +60,20 @@
 @implementation FMNetworkImage
 
 - (void)dealloc {
-	self.observeImageViewFrame = NO;
 	self.imageView = nil;
+	self.observeImageViewFrame = NO;
 	[self cancelLoading];
-	//	[self stopQueue];
-	//	[_URL autorelease]; _URL = nil;
+
 	self.onLoad = nil;
 	self.rawRemoteImage = nil;
+	self.placeholderImage = nil;
 	self.startedLoadingAt = nil;
 	self.conn = nil;
 	self.data = nil;
 	self.queue = nil;
 	[super dealloc];
 }
+
 - (void)log:(NSString*)format, ... NS_FORMAT_FUNCTION(1, 2) {
 #ifdef DEBUG
 	va_list args;

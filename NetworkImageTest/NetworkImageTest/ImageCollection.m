@@ -89,7 +89,17 @@ NSString* const ImageCollectionCell_ReuseIdentifier = @"ImageCollectionCell";
 	return (id)cell;
 }
 
-
+//- (void)removeCells {
+//	self.collectionView.dataSource = nil;
+//	self.collectionView.delegate = nil;
+//	[self.collectionView removeFromSuperview];
+//	self.collectionView = nil;
+//}
+//
+//- (void)viewDidAppear:(BOOL)animated {
+//	// memory release test
+//	[self performSelector:@selector(removeCells) withObject:nil afterDelay:5.0];
+//}
 
 @end
 
