@@ -8,7 +8,14 @@
 
 @class FMNetworkImage;
 
-@interface UIImageView (FMNetworkImageCategory)
+@protocol FMNetworkImageAttachable <NSObject>
+
+@property (nonatomic, retain) FMNetworkImage* netImage;
+@property (nonatomic, retain) UIImage* image;
+
+@end
+
+@interface UIImageView (FMNetworkImageCategory) <FMNetworkImageAttachable>
 @property (nonatomic, retain) FMNetworkImage* netImage;
 //LEGACY URL PROPERTY
 @property (nonatomic, retain) NSURL* imageURL;
@@ -33,6 +40,8 @@ typedef NS_ENUM(NSUInteger, FMNetworkImageStatus) {
 - (void)setURL:(NSURL *)URL completionBlock:(void (^)(UIImage * image))onLoad;
 - (void)cancelLoading;
 
++ (void)attachTo:(id<FMNetworkImageAttachable>)object;
+
 @property (readonly) FMNetworkImageStatus status;
 
 @property (nonatomic, retain) UIImage* placeholderImage;
@@ -55,10 +64,7 @@ typedef NS_ENUM(NSUInteger, FMNetworkImageStatus) {
 @property (nonatomic, assign) NSTimeInterval delayBeforeLoading;
 @property (nonatomic, copy) void (^onLoad) (UIImage* image);
 
-@property (atomic,retain) NSURLConnection* conn;
-@property (atomic,retain) NSMutableData* data;
-
-@property (atomic, assign) UIImageView* imageView;
+@property (atomic, assign) id<FMNetworkImageAttachable> imageReceiver;
 
 @property (nonatomic,retain) NSOperationQueue* queue;
 

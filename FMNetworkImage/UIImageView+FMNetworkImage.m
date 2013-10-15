@@ -19,9 +19,8 @@
 - (FMNetworkImage *)netImage {
 	FMNetworkImage *pack = objc_getAssociatedObject(self, @selector(netImage));
 	if (!pack) {
-		pack = [FMNetworkImage.new autorelease];
-		pack.imageView = self;
-		self.netImage = pack;
+		[FMNetworkImage attachTo:self];
+		pack = objc_getAssociatedObject(self, @selector(netImage));
 	}
 	return pack;
 }
@@ -37,12 +36,20 @@
 
 #pragma mark - Pack
 
-@interface FMNetworkImage ()
-@property (nonatomic,readwrite) FMNetworkImageStatus status;
+@interface FMNetworkImageConnectionDelegate : NSObject <NSURLConnectionDelegate,NSURLConnectionDataDelegate> {
+	FMNetworkImage* _netImage;
+}
+- (void)cancel;
+- (id)initWithFMNetworkImage:(FMNetworkImage*)netImage;
+@property (atomic,retain) NSURLConnection* conn;
+@property (atomic,retain) NSMutableData* data;
+@property (nonatomic,assign) FMNetworkImage* netImage;
 @end
 
-@interface FMNetworkImage (NSURLConnection) <NSURLConnectionDelegate,NSURLConnectionDataDelegate>
-- (void)processData;
+@interface FMNetworkImage ()
+@property (nonatomic,readwrite) FMNetworkImageStatus status;
+@property (atomic,assign) FMNetworkImageConnectionDelegate* connectionDelegate;
+- (void)processData:(NSData*)data;
 @end
 
 @interface FMNetworkImageOperation : NSOperation
@@ -59,15 +66,18 @@
 @implementation FMNetworkImage
 
 - (void)dealloc {
-	self.imageView = nil;
+	if (self.connectionDelegate) {
+		self.connectionDelegate.netImage = nil;
+		[self.connectionDelegate cancel];
+		self.connectionDelegate = nil;
+	}
+	self.imageReceiver = nil;
 	[self cancelLoading];
 
 	self.onLoad = nil;
 	self.rawRemoteImage = nil;
 	self.placeholderImage = nil;
 	self.startedLoadingAt = nil;
-	self.conn = nil;
-	self.data = nil;
 	self.queue = nil;
 	[super dealloc];
 }
@@ -77,9 +87,14 @@
 	va_list args;
 	va_start(args, format);
 	NSString* logMessage = [NSString.alloc initWithFormat:format arguments:args].autorelease;
-	NSLog(@"[%@:%2lx] imageView:%2lx %@", NSStringFromClass(self.class), (unsigned long)self, (unsigned long)_imageView, logMessage);
+	NSLog(@"[%@:%2lx] imageView:%2lx %@", NSStringFromClass(self.class), (unsigned long)self, (unsigned long)_imageReceiver, logMessage);
 	va_end(args);
 #endif
+}
+
++ (void)attachTo:(id<FMNetworkImageAttachable>)object {
+	object.netImage = [FMNetworkImage.new autorelease];
+	object.netImage.imageReceiver = object;
 }
 
 // Operation queue for downloading, processing and decoding images
@@ -126,7 +141,24 @@
 }
 
 - (CGSize)imageViewPixelSize {
-	return (CGSize){ _imageView.bounds.size.width * _imageScale, _imageView.bounds.size.height * _imageScale };
+	if ([self.imageReceiver isKindOfClass:UIImageView.class])
+		return (CGSize){ [(UIImageView*)self.imageReceiver bounds].size.width * _imageScale, [(UIImageView*)self.imageReceiver bounds].size.height * _imageScale };
+	return CGSizeZero;
+}
+
+- (UIViewContentMode)placeholderContentMode {
+	if (_placeholderContentMode)
+		return _placeholderContentMode;
+	if ([self.imageReceiver isKindOfClass:UIImageView.class])
+		return [(UIImageView*)self.imageReceiver contentMode];
+	return _placeholderContentMode;
+}
+- (UIViewContentMode)loadedImageContentMode {
+	if (_loadedImageContentMode)
+		return _loadedImageContentMode;
+	if ([self.imageReceiver isKindOfClass:UIImageView.class])
+		return [(UIImageView*)self.imageReceiver contentMode];
+	return _placeholderContentMode;
 }
 
 #pragma mark - Callbacks on Main Thread
@@ -153,12 +185,12 @@
 	else if (_onLoad)
 		_onLoad(image);
 	
-	if ( _crossfadeImages && image && image != _placeholderImage && _loadingTook > .03) { // && !_loadingFromCacheDontFade
+	if (_crossfadeImages && image && [self.imageReceiver isKindOfClass:UIImageView.class] && image != _placeholderImage && _loadingTook > .03) { // && !_loadingFromCacheDontFade
 #ifdef QUARTZCORE_H
 		CATransition* animation = [CATransition animation];
 		animation.type = kCATransitionFade;
 		animation.duration = .35;
-		[self.imageView.layer addAnimation:animation forKey:nil];
+		[[(UIImageView*)self.imageReceiver layer] addAnimation:animation forKey:nil];
 #else
 		[NSException exceptionWithName:@"com.fume.FMNetworkImage.QuartzCoreDisabled"
 								reason:@"If you want crossfading, you'll need to add QuarzCore Framework" userInfo:nil];
@@ -168,11 +200,13 @@
 	[self setImageFromAnyThread:image];
 }
 - (void)setImage:(UIImage *)image {
-	self.imageView.image = image;
+	self.imageReceiver.image = image;
+	if (![self.imageReceiver isKindOfClass:UIImageView.class]) return;
+	
 	if (_placeholderImage && image == _placeholderImage)
-		self.imageView.contentMode = self.placeholderContentMode;
+		[(UIImageView*)self.imageReceiver setContentMode:self.placeholderContentMode];
 	else if (image) {
-		self.imageView.contentMode = self.loadedImageContentMode;
+		[(UIImageView*)self.imageReceiver setContentMode:self.loadedImageContentMode];
 	}
 }
 
@@ -241,7 +275,7 @@
 	if (_fixImageCropResize) {
 		UIImage* decodedCache = [self.class cachedDecodedImageForSourceURL:url
 																 resizedTo:self.imageViewPixelSize
-														  usingContentMode:_loadedImageContentMode ? _loadedImageContentMode : _imageView.contentMode];
+														  usingContentMode:self.loadedImageContentMode];
 		if (decodedCache) {
 			_loadingFromCacheDontFade = YES;
 //			[self log:@"Resized Cache"];
@@ -264,7 +298,7 @@
 	}
 	
 	// show placeholder
-	if (!self.imageView.image && _placeholderImage) {
+	if (!self.imageReceiver.image && _placeholderImage) {
 		[self setImageFromAnyThread:_placeholderImage];
 	}
 	
@@ -294,20 +328,19 @@
 	self.loading = YES;
 	self.startedLoadingAt = NSDate.date;
 	
-	self.data = NSMutableData.data;
 	NSURLRequest* aRequest = [NSURLRequest requestWithURL:url];
-	self.conn = [NSURLConnection.alloc initWithRequest:aRequest delegate:self startImmediately:NO].autorelease;
-	[self.conn setDelegateQueue:self.queue];
-	[self.conn start];
+	FMNetworkImageConnectionDelegate* delegate = [[FMNetworkImageConnectionDelegate.alloc initWithFMNetworkImage:self] autorelease];
+	delegate.conn = [NSURLConnection.alloc initWithRequest:aRequest delegate:delegate startImmediately:NO].autorelease;
+
+	[delegate.conn setDelegateQueue:self.queue];
+	[delegate.conn start];
 }
 - (void)cancelLoading {
 	
 	self.status = FMNetworkImageStatus_Idle;
 	
-	if (self.conn) {
-		[self.conn cancel];
-		self.conn = nil;
-		self.data = nil;
+	if (self.connectionDelegate) {
+		[self.connectionDelegate cancel];
 	}
 	
 	[_URL autorelease]; _URL = nil;
@@ -318,16 +351,6 @@
 	if (_placeholderImage) {
 		[self setImageFromAnyThread:_placeholderImage];
 	}
-}
-- (UIViewContentMode)placeholderContentMode {
-	if (_placeholderContentMode == 0)
-		return self.imageView.contentMode;
-	return _placeholderContentMode;
-}
-- (UIViewContentMode)loadedImageContentMode {
-	if (_loadedImageContentMode == 0)
-		return self.imageView.contentMode;
-	return _loadedImageContentMode;
 }
 
 - (void)decodeImage {
@@ -356,8 +379,8 @@
 	
 	self.status = FMNetworkImageStatus_Decode;
 	
-	CGRect imageViewBounds = self.imageView.bounds;
-	UIViewContentMode contentMode = _loadedImageContentMode ? _loadedImageContentMode : _imageView.contentMode;
+	CGSize receiverSize = self.imageViewPixelSize;
+	UIViewContentMode contentMode = self.loadedImageContentMode;
 	
 	if (!_imageScale || _imageScale < 1)
 		_imageScale = UIScreen.mainScreen.scale;
@@ -368,24 +391,23 @@
 	
 	if (_fixImageCropResize) { // determine cropping / resize
 		CGFloat imageAspectRatio = imageToDecompress.size.width / imageToDecompress.size.height;
-		CGFloat viewAspectRatio = imageViewBounds.size.width / imageViewBounds.size.height;
+		CGFloat viewAspectRatio = receiverSize.width / receiverSize.height;
 		CGPoint viewImageRatio = (CGPoint){
-			(imageViewBounds.size.width * _imageScale) / imageToDecompress.size.width,
-			(imageViewBounds.size.height * _imageScale) / imageToDecompress.size.height
+			receiverSize.width / imageToDecompress.size.width,
+			receiverSize.height / imageToDecompress.size.height
 		};
-		CGSize imageViewSize = CGSizeMake( imageViewBounds.size.width * _imageScale, imageViewBounds.size.height * _imageScale);
 		
 		if (contentMode == UIViewContentModeScaleAspectFill) { // most widely used
 			
 			if (viewAspectRatio > imageAspectRatio) {
-				targetRect.size.height = (int)floorf(imageToDecompress.size.width * imageViewBounds.size.height / imageViewBounds.size.width);
+				targetRect.size.height = (int)floorf(imageToDecompress.size.width * receiverSize.height / receiverSize.width);
 				targetRect.origin.y += (int)floorf((imageToDecompress.size.height - targetRect.size.height) / 2.0);
 			} else {
-				targetRect.size.width = (int)floorf(imageToDecompress.size.height  * imageViewBounds.size.width / imageViewBounds.size.height);
+				targetRect.size.width = (int)floorf(imageToDecompress.size.height  * receiverSize.width / receiverSize.height);
 				targetRect.origin.x += (int)floorf((imageToDecompress.size.width - targetRect.size.width) / 2.0);
 			}
 			
-			targetSize = imageViewSize;
+			targetSize = receiverSize;
 		} else
 			if (contentMode == UIViewContentModeScaleAspectFit) { // most widely used
 				CGFloat multiplyRatio = MIN(viewImageRatio.x, viewImageRatio.y);
@@ -393,9 +415,9 @@
 				targetSize = (CGSize){ (int)floorf(imageToDecompress.size.width * multiplyRatio), (int)floorf(imageToDecompress.size.height * multiplyRatio) };
 			} else
 				if (contentMode == UIViewContentModeScaleToFill) {
-					targetSize = imageViewSize;
+					targetSize = receiverSize;
 				} else {
-					targetSize = imageViewSize;
+					targetSize = receiverSize;
 					targetRect.size = targetSize;
 					
 					if (contentMode == UIViewContentModeCenter || contentMode == UIViewContentModeTop || contentMode == UIViewContentModeBottom) {
@@ -464,7 +486,7 @@
 													 targetSize.height,
 													 8,
 													 // Just always return width * 4 will be enough
-													 CGImageGetWidth(imageRef) * 4,
+													 targetSize.width * 4,
 													 // System only supports RGB, set explicitly
 													 deviceColorSpace,
 													 // Makes system don't need to do extra conversion when displayed.
@@ -530,56 +552,100 @@
 	});
 }
 
+- (void)processData:(NSData*)data {
+//	[self log:@"processing data"];
+	
+	self.status = FMNetworkImageStatus_Convert;
+	
+	UIImage* image = [UIImage imageWithData:data];
+	
+	if ([FMNetworkImageOperation.currentOperation isCancelled]) return;
+	
+	self.rawRemoteImage = image;
+	[self decodeImage];
+}
+
 - (NSOperationQueue *)queue {
-	if (!_queue) {
-		@synchronized (self) {
-			if (!_queue)
-				_queue = [NSOperationQueue new];
-		}
-	}
-	return _queue;
+	return FMNetworkImageOperation.queue;
+	
+//	if (!_queue) {
+//		@synchronized (self) {
+//			if (!_queue)
+//				_queue = [NSOperationQueue new];
+//		}
+//	}
+//	return _queue;
 }
 
 @end
 
-@implementation FMNetworkImage (NSURLConnection)
+@implementation FMNetworkImageConnectionDelegate
 
+- (void)dealloc {
+	self.netImage = nil;
+	[self cancel];
+	[super dealloc];
+}
+- (id)initWithFMNetworkImage:(FMNetworkImage*)netImage {
+    self = [super init];
+    if (self) {
+		self.netImage = netImage;
+        self.data = NSMutableData.data;
+    }
+    return self;
+}
+- (void)cancel {
+	@synchronized (self) {
+		self.data = nil;
+		if (self.conn) {
+			[self.conn cancel];
+			self.conn = nil;
+		}
+	}
+}
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-	[self doneLoadingImageFromAnyThread:nil];
+	[self retain];
 	self.conn = nil;
+	[self.netImage doneLoadingImageFromAnyThread:nil];
+	[self release];
 }
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-	[self.data appendData:data];
 	if ([FMNetworkImageOperation.currentOperation isCancelled]) {
-		[connection cancel];
-		self.data = nil;
-		self.conn = nil;
+		[self cancel];
 		return;
 	}
+	[self.data appendData:data];
 }
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
 	// ..
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-	if ([FMNetworkImageOperation.currentOperation isCancelled]) return;
-	
-	[self schedule:@selector(processData)];
+	[self retain];
 	self.conn = nil;
+	if ([FMNetworkImageOperation.currentOperation isCancelled]) {
+		[self release];
+		return;
+	}
+	
+	[self.netImage schedule:@selector(processData:) withObject:self.data];
+	[self release];
 }
-- (void)processData { // runs in another thread
-	//	[self log:@"processing data"];
-	
-	self.status = FMNetworkImageStatus_Convert;
-	
-	NSData* data = self.data;
-	[data retain];
-	self.data = nil;
-	UIImage* image = [UIImage imageWithData:data];
-	[data release];
-	
-	if ([FMNetworkImageOperation.currentOperation isCancelled]) return;
-	self.rawRemoteImage = image;
-	[self decodeImage];
+
+- (void)setNetImage:(FMNetworkImage *)netImage {
+	@synchronized (self) {
+		_netImage.connectionDelegate = nil;
+		
+		_netImage = netImage;
+		
+		_netImage.connectionDelegate = self;
+	}
+}
+- (FMNetworkImage *)netImage {
+	__block FMNetworkImage* netImage = nil;
+	@synchronized (self) {
+		netImage = _netImage;
+	}
+	return netImage;
 }
 
 @end
@@ -590,6 +656,7 @@
 	self.parameter = nil;
 	[super dealloc];
 }
+
 + (FMNetworkImageOperation*)operationWithOwner:(id)owner selector:(SEL)selector {
 	return [self.class operationWithOwner:owner target:owner selector:selector];
 }
